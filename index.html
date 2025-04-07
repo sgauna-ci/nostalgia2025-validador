@@ -1,0 +1,72 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Validador QR - Nostalgia 2025</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 40px;
+      background: #f3f3f3;
+    }
+    #output {
+      margin-top: 20px;
+      font-size: 18px;
+      color: green;
+    }
+    video {
+      width: 100%;
+      max-width: 400px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Validador QR - Nostalgia 2025</h1>
+  <p>Escaneá una entrada para validarla</p>
+
+  <video id="preview"></video>
+  <div id="output"></div>
+
+  <script src="https://unpkg.com/html5-qrcode@2.3.7/minified/html5-qrcode.min.js"></script>
+  <script>
+    const html5QrCode = new Html5Qrcode("preview");
+    const output = document.getElementById("output");
+
+    function iniciarScanner() {
+      Html5Qrcode.getCameras().then((devices) => {
+        if (devices && devices.length) {
+          const cameraId = devices[0].id;
+          html5QrCode.start(
+            cameraId,
+            {
+              fps: 10,
+              qrbox: 250,
+            },
+            (decodedText) => {
+              html5QrCode.stop();
+              output.innerText = "Redirigiendo a validación...";
+
+              // Agregar modo staff al link escaneado
+              const url = new URL(decodedText);
+              url.searchParams.set("modo", "staff");
+
+              window.location.href = url.toString();
+            },
+            (errorMessage) => {
+              // console.log(errorMessage);
+            }
+          );
+        }
+      }).catch((err) => {
+        output.innerText = "No se pudo acceder a la cámara";
+        console.error(err);
+      });
+    }
+
+    iniciarScanner();
+  </script>
+</body>
+</html>
