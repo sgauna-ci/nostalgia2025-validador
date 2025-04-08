@@ -17,6 +17,11 @@
       font-size: 18px;
       color: green;
     }
+    #error-message {
+      margin-top: 20px;
+      font-size: 18px;
+      color: red;
+    }
     video {
       width: 100%;
       max-width: 400px;
@@ -29,11 +34,13 @@
 
   <video id="preview"></video>
   <div id="output"></div>
+  <div id="error-message"></div>
 
   <script src="https://unpkg.com/html5-qrcode@2.3.7/minified/html5-qrcode.min.js"></script>
   <script>
     const html5QrCode = new Html5Qrcode("preview");
     const output = document.getElementById("output");
+    const errorMsg = document.getElementById("error-message");
 
     function iniciarScanner() {
       Html5Qrcode.getCameras().then((devices) => {
@@ -49,20 +56,20 @@
               html5QrCode.stop();
               output.innerText = "Redirigiendo a validación...";
 
-              // Agregar modo staff al link escaneado
               const url = new URL(decodedText);
               url.searchParams.set("modo", "staff");
-
               window.location.href = url.toString();
             },
             (errorMessage) => {
-              // console.log(errorMessage);
+              console.warn("Scan error:", errorMessage);
             }
           );
+        } else {
+          errorMsg.innerText = "⚠ No se encontró ninguna cámara en el dispositivo.";
         }
       }).catch((err) => {
-        output.innerText = "No se pudo acceder a la cámara";
-        console.error(err);
+        console.error("Camera error:", err);
+        errorMsg.innerText = "🚫 No se pudo acceder a la cámara. Verificá los permisos del navegador.";
       });
     }
 
